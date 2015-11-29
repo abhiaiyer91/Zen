@@ -1,7 +1,7 @@
 export default class ZenStore {
   constructor(reducer, initialState) {
     if (!_.isFunction(reducer)) {
-      throw new Meteor.Error('Stores must be constructed with reducer functions');
+      throw new Error('Stores must be constructed with reducer functions');
     }
     check(initialState, Object);
     this.currentReducer = reducer;
@@ -60,7 +60,7 @@ export default class ZenStore {
    */
   dispatch(action) {
     if (!_.isObject(action)) {
-      throw new Meteor.Error(
+      throw new Error(
         'Actions must be plain objects. ' +
         'Use custom middleware for async actions.'
       )
@@ -74,7 +74,7 @@ export default class ZenStore {
     }
 
     if (this.isDispatching) {
-      throw new Meteor.Error('Reducers may not dispatch actions.')
+      throw new Error('Reducers may not dispatch actions.')
     }
 
     try {
