@@ -5,6 +5,7 @@ export default class ZenStore {
     }
     check(initialState, Object);
     this.currentReducer = reducer;
+
     // a null mongo collection to hold the single document
     this._collection = new Mongo.Collection(null);
     this._collection.remove({});

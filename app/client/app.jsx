@@ -1,14 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { combineReducers } from 'redux';
 import reactMixin from 'react-mixin';
 import ZenStore from '../../modules/ZenStore/store';
-
+import combineProcesses from '../../modules/ZenStore/combineProcesses';
 const helloThere = {
   id: 0,
   text: 'Hello World',
   completed: false
 };
-
 
 const todo = (state = {}, action = {}, collection = {}) => {
   switch (action.type) {
@@ -43,10 +43,136 @@ const todos = (state = {}, action = {}) => {
 };
 
 /**
+ * This action processor sets the visibility on todo items
+ * @param state
+ * @param action
+ * @returns {*}
+ */
+const visibilityFilter = (state = {}, action = {}) => {
+  switch (action.type) {
+    case 'SET_VISIBILITY_FILTER':
+      state.update({}, {$set: {visibility: action.filter}});
+      return state.findOne().visibility;
+    default:
+      return state;
+  }
+};
+
+const processes = combineProcesses({
+  todos,
+  visibilityFilter
+});
+
+const TodoStore = new ZenStore(processes, {
+  todos: [helloThere],
+  visibility: 'SHOW_ALL'
+});
+
+
+/**
  * Create a new Zen Store
  * @type {ZenStore|*}
  */
-const TodoStore = new ZenStore(todos, {todos: [helloThere]});
+
+
+const getVisibleTodos = (todos, filter) => {
+  switch (filter) {
+    case 'SHOW_ALL':
+      return todos;
+    case 'SHOW_COMPLETED':
+      return todos.filter(
+          t => t.completed
+      );
+    case 'SHOW_ACTIVE':
+      return todos.filter(
+          t => !t.completed
+      );
+    default:
+      return todos;
+  }
+};
+
+
+/**
+ * Stateless Component Function for Todo Item
+ * @param item
+ * @param onToggle
+ * @returns {XML}
+ * @constructor
+ */
+const TodoItem = ({item, onToggle, onDelete}) => {
+  const completed = item.completed ? 'line-through' : 'none';
+  const BtnText = {
+    text: item.completed ? 'Redo' : 'Done',
+    style: item.completed ? 'btn btn-danger' : 'btn btn-success'
+  };
+  const itemStyle = {
+    textDecoration: completed
+  };
+  return (
+    <div>
+      <div className="flex-grid grid-center">
+        <div className="grid-cell" style={itemStyle}> {item.text} </div>
+        <div className="grid-cell text-right">
+          <div className="btn-group">
+            <button className="btn btn-danger" onClick={onDelete.bind(this, item.id)}>Delete</button>
+            <button className={BtnText.style} onClick={onToggle.bind(this, item.id)}>{BtnText.text}</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <br/>
+      </div>
+    </div>
+  );
+};
+
+const FilterLink = ({
+  filter,
+  currentFilter,
+  children
+  }) => {
+  if (filter === currentFilter) {
+    return <span>{children}</span>;
+  }
+  return (
+    <a href="#" onClick={e => {
+    e.preventDefault();
+    TodoStore.dispatch({type: 'SET_VISIBILITY_FILTER', filter});
+    }}>
+      {
+        children
+      }
+    </a>
+  );
+};
+
+const FilterBarComponent = ({visibilityFilter}) => (
+  <p>
+    Show:
+    {' '}
+    <FilterLink
+      filter='SHOW_ALL'
+      currentFilter={visibilityFilter()}
+      >
+      All
+    </FilterLink>
+    {' - '}
+    <FilterLink
+      filter='SHOW_ACTIVE'
+      currentFilter={visibilityFilter()}
+      >
+      Active
+    </FilterLink>
+    {' - '}
+    <FilterLink
+      filter='SHOW_COMPLETED'
+      currentFilter={visibilityFilter()}
+      >
+      Completed
+    </FilterLink>
+  </p>
+);
 
 const TodoComponent = class TodoComponent extends React.Component {
   constructor() {
@@ -60,12 +186,16 @@ const TodoComponent = class TodoComponent extends React.Component {
     }
   }
 
+  visibilityFilter() {
+    return TodoStore.getState().visibility;
+  }
+
   /**
    * Reactive get on TodoStore state
    * @returns {*|Array}
    */
   getItems() {
-    return TodoStore.getState().todos;
+    return getVisibleTodos(TodoStore.getState().todos, this.visibilityFilter());
   }
 
   /**
@@ -146,6 +276,8 @@ const TodoComponent = class TodoComponent extends React.Component {
 
 
           <h1>Todos List</h1>
+
+          <FilterBarComponent visibilityFilter={this.visibilityFilter}/>
           {items}
         </div>
 
@@ -156,40 +288,6 @@ const TodoComponent = class TodoComponent extends React.Component {
 
 // Reactivity, Props to James for this.
 reactMixin(TodoComponent.prototype, TrackerReact);
-
-/**
- * Stateless Component Function for Todo Item
- * @param item
- * @param onToggle
- * @returns {XML}
- * @constructor
- */
-const TodoItem = ({item, onToggle, onDelete}) => {
-  const completed = item.completed ? 'line-through' : 'none';
-  const BtnText = {
-    text: item.completed ? 'Redo' : 'Done',
-    style: item.completed ? 'btn btn-danger' : 'btn btn-success'
-  };
-  const itemStyle = {
-    textDecoration: completed
-  };
-  return (
-    <div>
-      <div className="flex-grid grid-center">
-        <div className="grid-cell" style={itemStyle}> {item.text} </div>
-        <div className="grid-cell text-right">
-          <div className="btn-group">
-            <button className="btn btn-danger" onClick={onDelete.bind(this, item.id)}>Delete</button>
-            <button className={BtnText.style} onClick={onToggle.bind(this, item.id)}>{BtnText.text}</button>
-          </div>
-        </div>
-      </div>
-      <div>
-        <br/>
-      </div>
-    </div>
-  );
-};
 
 Meteor.startup(() => {
   const root = document.createElement('div');
