@@ -35,6 +35,8 @@ const todos = (state = {}, action = {}) => {
     case 'TOGGLE_TODO':
       let currentTodos = state.findOne().todos;
       return currentTodos.map(t => todo(t, action, state));
+    case 'DELETE_TODO':
+      return state.update({}, {$pull: {'todos': {id: action.data.id}}});
     default:
       return state;
   }
@@ -52,6 +54,7 @@ const TodoComponent = class TodoComponent extends React.Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.triggerAdd = this.triggerAdd.bind(this);
     this.onToggle = this.onToggle.bind(this);
+    this.onDelete = this.onDelete.bind(this);
     this.state = {
       inputVal: ''
     }
@@ -83,7 +86,20 @@ const TodoComponent = class TodoComponent extends React.Component {
       data: {
         id: id
       }
-    })
+    });
+  }
+
+  /**
+   * Dispatch to the TodoStore a Delete Action
+   * @param id
+   */
+  onDelete(id) {
+    TodoStore.dispatch({
+      type: 'DELETE_TODO',
+      data: {
+        id: id
+      }
+    });
   }
 
   /**
@@ -105,7 +121,7 @@ const TodoComponent = class TodoComponent extends React.Component {
 
   render() {
     let items = this.getItems().map((item) => {
-      return <TodoItem onToggle={this.onToggle} key={item.id} item={item}/>
+      return <TodoItem onDelete={this.onDelete} onToggle={this.onToggle} key={item.id} item={item}/>
     });
     const listStyle = {
       maxWidth: "480px",
@@ -138,7 +154,7 @@ const TodoComponent = class TodoComponent extends React.Component {
   }
 };
 
-// Reactivity True
+// Reactivity, Props to James for this.
 reactMixin(TodoComponent.prototype, TrackerReact);
 
 /**
@@ -148,7 +164,7 @@ reactMixin(TodoComponent.prototype, TrackerReact);
  * @returns {XML}
  * @constructor
  */
-const TodoItem = ({item, onToggle}) => {
+const TodoItem = ({item, onToggle, onDelete}) => {
   const completed = item.completed ? 'line-through' : 'none';
   const BtnText = {
     text: item.completed ? 'Redo' : 'Done',
@@ -158,10 +174,18 @@ const TodoItem = ({item, onToggle}) => {
     textDecoration: completed
   };
   return (
-    <div className="media">
-      <div className="media-body media-middle" style={itemStyle}> {item.text} </div>
-      <div className="media-right">
-        <button className={BtnText.style} onClick={onToggle.bind(this, item.id)}>{BtnText.text}</button>
+    <div>
+      <div className="flex-grid grid-center">
+        <div className="grid-cell" style={itemStyle}> {item.text} </div>
+        <div className="grid-cell text-right">
+          <div className="btn-group">
+            <button className="btn btn-danger" onClick={onDelete.bind(this, item.id)}>Delete</button>
+            <button className={BtnText.style} onClick={onToggle.bind(this, item.id)}>{BtnText.text}</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <br/>
       </div>
     </div>
   );
