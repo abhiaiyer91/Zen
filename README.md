@@ -1,9 +1,12 @@
 # Zen
 
+## Procedures
+
 ## Stores
 
+## Action Dispatchers
 
-## Actions
+## Action Creators
 
+## Providers
 
-## The Process
