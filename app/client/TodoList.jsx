@@ -2,7 +2,8 @@ import React from 'react';
 import reactMixin from 'react-mixin';
 import TodoItem from './TodoItem';
 import getVisibleTodos from './helpers/getVisibleTodos';
-
+import toggleTodo from './actionDispatchers/toggleTodo';
+import deleteTodo from './actionDispatchers/deleteTodo';
 
 const TodoList = ({
   todos,
@@ -20,18 +21,14 @@ class VisibleTodoList extends React.Component {
     this.onToggle = this.onToggle.bind(this);
     this.onDelete = this.onDelete.bind(this);
   }
+
   /**
    * Dispatch to the TodoStore a Toggle Action
    * @param id
    */
   onToggle(id) {
     const { store } = this.context;
-    store.dispatch({
-      type: 'TOGGLE_TODO',
-      data: {
-        id: id
-      }
-    });
+    store.dispatch(toggleTodo(id));
   }
 
   /**
@@ -40,13 +37,9 @@ class VisibleTodoList extends React.Component {
    */
   onDelete(id) {
     const { store } = this.context;
-    store.dispatch({
-      type: 'DELETE_TODO',
-      data: {
-        id: id
-      }
-    });
+    store.dispatch(deleteTodo(id));
   }
+
   /**
    * Get the current state of the visibility filter
    * @returns {string|*}
@@ -64,13 +57,12 @@ class VisibleTodoList extends React.Component {
     const { store } = this.context;
     return getVisibleTodos(store.getState().todos, this.visibilityFilter());
   }
+
   render() {
     const props = this.props;
     return (
       <TodoList
-        todos={
-          this.getItems()
-        }
+        todos={this.getItems()}
         onDeleteClick={this.onDelete}
         onToggleClick={this.onToggle}
         />

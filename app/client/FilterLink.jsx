@@ -1,5 +1,8 @@
 import React from 'react';
 import reactMixin from 'react-mixin';
+import setVisibility from './actionDispatchers/setVisibility';
+
+
 const Link = ({
   active,
   children,
@@ -30,10 +33,7 @@ class FilterLink extends React.Component {
     let visibility = this.currentState().visibility;
     return (
       <Link active={props.filter === visibility} onClick={() =>
-          store.dispatch({
-            type: 'SET_VISIBILITY_FILTER',
-            filter: props.filter
-          })
+          store.dispatch(setVisibility(props.filter))
         }>
         {props.children}
       </Link>

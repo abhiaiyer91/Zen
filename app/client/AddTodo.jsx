@@ -1,4 +1,5 @@
 import React from 'react';
+import addTodo from './actionDispatchers/addTodo';
 
 const AddTodoComponent = (props, {store}) => {
   let input;
@@ -11,15 +12,7 @@ const AddTodoComponent = (props, {store}) => {
       </div>
       <div className="media-right">
         <button className="btn btn-primary" onClick={() => {
-            store.dispatch({
-              id: 1,
-              type: 'ADD_TODO',
-              data: {
-                id: Random.id(),
-                text: input.value,
-                completed: false
-              }
-            });
+            store.dispatch(addTodo(input.value));
             input.value = '';
         }}>Add Item
         </button>
