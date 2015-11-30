@@ -1,6 +1,5 @@
 import React from 'react';
-import TodoStore from './store/TodoStore';
-
+import reactMixin from 'react-mixin';
 const Link = ({
   active,
   children,
@@ -20,13 +19,18 @@ const Link = ({
 };
 
 class FilterLink extends React.Component {
+  currentState() {
+    const { store } = this.context;
+    const currentState = store.getState();
+    return currentState;
+  }
   render() {
     const props = this.props;
-    const currentState = TodoStore.getState();
-
+    const { store } = this.context;
+    let visibility = this.currentState().visibility;
     return (
-      <Link active={props.filter === currentState.visibility} onClick={() =>
-          TodoStore.dispatch({
+      <Link active={props.filter === visibility} onClick={() =>
+          store.dispatch({
             type: 'SET_VISIBILITY_FILTER',
             filter: props.filter
           })
@@ -36,5 +40,11 @@ class FilterLink extends React.Component {
     );
   }
 }
+
+FilterLink.contextTypes = {
+  store: React.PropTypes.object
+};
+
+reactMixin(FilterLink.prototype, TrackerReact);
 
 module.exports = FilterLink;

@@ -3,6 +3,7 @@ import React from 'react';
  * Stateless Component Function for Todo Item
  * @param item
  * @param onToggle
+ * * @param onDelete
  * @returns {XML}
  * @constructor
  */

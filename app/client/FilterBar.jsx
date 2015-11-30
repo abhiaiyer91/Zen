@@ -1,8 +1,7 @@
 import React from 'react';
-import TodoStore from './store/TodoStore';
 import FilterLink from './FilterLink';
 
-const FilterBarComponent = ({visibilityFilter}) => (
+const FilterBarComponent = () => (
   <p>
     Show:
     {' '}
