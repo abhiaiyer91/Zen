@@ -47,6 +47,31 @@ export default class ZenStore {
   }
 
   /**
+   * Time travel the stores state back to a previous state
+   * @param logId
+   */
+  timeTravelBack(logId) {
+    var currentState = this.getState();
+    var log = currentState && currentState.log;
+    if (_.isUndefined(log)) {
+      return;
+    }
+    var previousLogData;
+    if (logId) {
+      previousLogData = log[logId - 1];
+    } else {
+      var lastLog = _.last(log);
+      var lastLogId = lastLog && lastLog.id || 1;
+      var lastLogIndex = lastLogId - 1 < 0 ? 0 : lastLogId - 1;
+      previousLogData = log[lastLogIndex];
+    }
+    _.extend(previousLogData, {
+      log: log
+    });
+    this.hydrate(previousLogData.data);
+  }
+
+  /**
    * Dispatches an action. It is the only way to trigger a state change.
    *
    * The `reducer` function, used to create the store, will be called with the
@@ -79,6 +104,19 @@ export default class ZenStore {
 
     try {
       this.isDispatching = true;
+      var actionType = Session.get('recent.action.type') || [];
+      Session.set('recent.action.type', [...actionType, action]);
+      // grab the current state of the object
+      var currentState = this.getState();
+      var currentLogId = currentState && _.size(currentState.log) + 1;
+      this.getCollection().update({}, {
+        $push: {
+          'log': {
+            id: currentLogId,
+            data: currentState
+          }
+        }
+      });
       this.currentReducer(this.getCollection(), action)
     } finally {
       this.isDispatching = false
@@ -86,3 +124,5 @@ export default class ZenStore {
     return action
   }
 }
+
+

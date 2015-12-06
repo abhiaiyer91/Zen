@@ -32,3 +32,7 @@ const TodoStore = new ZenStore(processes, {
 });
 
 module.exports = TodoStore;
+
+Tracker.autorun(() => {
+  console.log(TodoStore.getState());
+});
