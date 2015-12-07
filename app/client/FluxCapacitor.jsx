@@ -21,6 +21,15 @@ class RewindButton extends React.Component {
 
   timeTravel() {
     const { store } = this.context;
+    const actions = Session.get('recent.action.type') || [];
+    let actionsReversed = actions && actions.reverse();
+    let returnedAction;
+    if (actionsReversed.length === 1) {
+      returnedAction = [];
+    } else {
+      returnedAction = actionsReversed.splice(0, 1);
+    }
+    Session.set('recent.action.type', returnedAction);
     return store.timeTravelBack();
   }
 
@@ -37,14 +46,15 @@ class RewindButton extends React.Component {
   }
 
   getActions() {
-    return Session.get('recent.action.type') || [];
+    const actions = Session.get('recent.action.type') || [];
+    return actions && actions.reverse();
   }
 
   render() {
     var action = this.getActions() && this.getActions().map((action) => {
         var item = JSON.stringify(action, null, 2);
         return (
-          <div>
+          <div className="action-list-item">
             <div className="action-header">
               <span>{action.type}</span>
             </div>
