@@ -5,52 +5,6 @@ import getVisibleTodos from './helpers/getVisibleTodos';
 import toggleTodo from './actionDispatchers/toggleTodo';
 import deleteTodo from './actionDispatchers/deleteTodo';
 
-
-class RewindButton extends React.Component {
-  constructor() {
-    super();
-    this.timeTravel = this.timeTravel.bind(this);
-    this.getActions = this.getActions.bind(this);
-  }
-
-  timeTravel() {
-    const { store } = this.context;
-    return store.timeTravelBack();
-  }
-
-  getActions() {
-    return Session.get('recent.action.type') || [];
-  }
-
-  render() {
-    var action = this.getActions() && this.getActions().map((action) => {
-      var item = JSON.stringify(action);
-      return (
-        <div>
-          <pre>
-          {item}
-          </pre>
-        </div>
-      )
-    });
-    var style = {
-      marginBottom: 30
-    };
-    return (
-      <div>
-        <button style={style} onClick={this.timeTravel} className="btn btn-warning">Rewind</button>
-        {action}
-      </div>
-    )
-  }
-}
-
-RewindButton.contextTypes = {
-  store: React.PropTypes.object
-};
-
-reactMixin(RewindButton.prototype, TrackerReact);
-
 const TodoList = ({
   todos,
   onDeleteClick,
@@ -113,7 +67,6 @@ class VisibleTodoList extends React.Component {
           onDeleteClick={this.onDelete}
           onToggleClick={this.onToggle}
           />
-        <RewindButton/>
       </div>
     );
   }

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import TodoStore from './store/TodoStore';
 import VisibleTodoList from './TodoList';
 import AddTodoComponent from './AddTodo';
+import RewindButton from './FluxCapacitor';
 import FilterBarComponent from './FilterBar';
 import Provider from '../../modules/ZenStore/ZenProvider';
 
@@ -18,14 +19,17 @@ const TodoComponent = class TodoComponent extends React.Component {
     };
     const { store }  = this.props;
     return (
-      <div className="container">
-        <div style={listStyle}>
-          <AddTodoComponent store={store}/>
+      <div>
+        <div className="container">
+          <div style={listStyle}>
+            <AddTodoComponent store={store}/>
 
-           <h1>Todos List</h1>
-           <FilterBarComponent store={store}/>
-           <VisibleTodoList store={store}/>
+            <h1>Todos List</h1>
+            <FilterBarComponent store={store}/>
+            <VisibleTodoList store={store}/>
+          </div>
         </div>
+        <RewindButton/>
       </div>
     )
   }
