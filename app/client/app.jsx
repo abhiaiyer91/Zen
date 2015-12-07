@@ -36,6 +36,7 @@ const TodoComponent = class TodoComponent extends React.Component {
 };
 
 Meteor.startup(() => {
+  console.log('finsihed being called');
   const root = document.createElement('div');
   root.setAttribute('id', 'root');
   document.body.appendChild(root);

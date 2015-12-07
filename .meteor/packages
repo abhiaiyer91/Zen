@@ -22,3 +22,5 @@ twbs:bootstrap
 ultimatejs:tracker-react
 less
 minimongo
+zenflux:actions
+todo-actions

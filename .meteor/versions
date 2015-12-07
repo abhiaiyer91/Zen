@@ -54,6 +54,7 @@ session@1.1.1
 spacebars@1.0.7
 spacebars-compiler@1.0.7
 standard-minifiers@1.0.2
+todo-actions@0.0.1
 tracker@1.0.9
 twbs:bootstrap@3.3.6
 ui@1.0.8
@@ -65,3 +66,4 @@ webapp-hashing@1.0.5
 webpack:npmworkaround@0.1.0
 webpack:reload@0.2.0
 webpack:webpack@0.3.5
+zenflux:actions@0.0.2
